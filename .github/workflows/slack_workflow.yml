@@ -1,32 +1,37 @@
-# .github/workflows/daily-slack-messages.yml
-
 name: Send Daily Slack Messages
 
 on:
   schedule:
-    # Schedule to run at 9:00 AM UTC every day. Adjust to your timezone.
-    - cron: '0 19 * * *'
-    # Schedule to run at 5:00 PM (17:00) UTC every day. Adjust to your timezone.
-    - cron: '0 20 * * *'
+    # Schedule to run at 7:00 PM JST (10:00 UTC) every day.
+    - cron: '0 10 * * *'
+    # Schedule to run at 8:00 PM JST (11:00 UTC) every day.
+    - cron: '0 11 * * *'
   # This line allows you to manually run the workflow from the Actions tab
   workflow_dispatch:
 
 jobs:
   send-morning-message:
-    # This job will only run for the 9 AM schedule
-    if: github.event.schedule == '0 19 * * *'
+    # This job will only run for the 7 PM JST schedule
+    if: github.event.schedule == '0 10 * * *'
     runs-on: ubuntu-latest
+    # Specify the environment to use its secrets
+    environment: stg
     steps:
       - name: Send Morning Slack Message with Mention
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"<@U08ND11EWBG> \n What did you learn today? Were you able to complete all your tasks?"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"<@U08ND11EWBG> \n What did you learn today? Were you able to complete all your tasks?"}' $SLACK_WEBHOOK_URL
 
-  send-afternoon-message:
-    # This job will only run for the 5 PM schedule
-    if: github.event.schedule == '0 20 * * *'
+  send-evening-message:
+    # This job will only run for the 8 PM JST schedule
+    if: github.event.schedule == '0 11 * * *'
     runs-on: ubuntu-latest
+    # Specify the environment to use its secrets
+    environment: stg
     steps:
-      - name: Send Afternoon Slack Message with Mention
+      - name: Send Evening Slack Message with Mention
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          # IMPORTANT: Replace U0123ABCDE with your actual Slack Member ID
-          curl -X POST -H 'Content-type: application/json' --data '{"text":"<@U08ND11EWBG>\n What do you plan to do tomorrow?"}' ${{ secrets.SLACK_WEBHOOK_URL }}
+          curl -X POST -H 'Content-type: application/json' --data '{"text":"<@U08ND11EWBG>\n What do you plan to do tomorrow?"}' $SLACK_WEBHOOK_URL
